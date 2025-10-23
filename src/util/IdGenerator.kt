@@ -11,7 +11,7 @@ object IdGenerator {
     }
     fun generateMemberId(): String {
         memberCounter++
-        return "Member-${String.format("%04d", memberCounter)}"
+        return "AG-${String.format("%04d", memberCounter)}"
     }
     fun generateBorrowingId(): String {
         borrowingCounter++

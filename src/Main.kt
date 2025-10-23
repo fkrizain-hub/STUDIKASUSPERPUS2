@@ -3,120 +3,148 @@ import repository.*
 import service.*
 
 // --- INISIALISASI LAYER ---
-// (Repo Anda, ditambah repo untuk Akun)
 val bookRepo: Repository<Book> = InMemoryRepo()
 val memberRepo: Repository<Member> = InMemoryRepo()
 val borrowRepo: Repository<Borrowing> = InMemoryRepo()
-val userAccountRepo: Repository<UserAccount> = InMemoryRepo() // <-- SUDAH DITAMBAHKAN
+val userAccountRepo: Repository<UserAccount> = InMemoryRepo()
 
 val catalogueservice = Catalogueservice(bookRepo)
-// Berikan userAccountRepo ke MemberService
-val memberservice = Memberservice(memberRepo, userAccountRepo) // <-- SUDAH DI-UPDATE
+val memberservice = Memberservice(memberRepo, userAccountRepo)
 val reservationservice = Reservationservice()
 val circulationservice = Circulationservice(bookRepo, memberRepo, borrowRepo, reservationservice)
 val reportservice = Reportservice(borrowRepo, bookRepo, reservationservice)
-val authservice = Authenticationservice(userAccountRepo) // (Inisialisasi Anda sudah benar)
+val authservice = Authenticationservice(userAccountRepo)
 
-
-// --- FUNGSI SETUP DATA AWAL ---
 fun setupearlydata() {
-    // Setup Buku (dari kode Anda)
     catalogueservice.addPrintedBook("Laskar Pelangi", "Andrea Hirata", 2005, "Novel", 529, 5)
-    catalogueservice.addPrintedBook("Bumi Manusia", "Pramoedya Ananta Toer", 1980, "Sejarah", 535, 0) // Stok 0
+    catalogueservice.addPrintedBook("Bumi Manusia", "Pramoedya Ananta Toer", 1980, "Sejarah", 535, 0)
     catalogueservice.addPrintedBook("Filosofi Teras", "Henry Manampiring", 2018, "Self-Help", 346, 3)
     catalogueservice.addDigitalBook("Clean Code", "Robert C. Martin", 2008, "Pemrograman", 22.5, "PDF")
     catalogueservice.addDigitalBook("Atomic Habits", "James Clear", 2018, "Self-Help", 5.3, "EPUB")
 
-    // --- LOGIKA SETUP MEMBER BARU ---
-    // (Sekarang memberservice akan OTOMATIS membuat AkunPengguna juga)
-    memberservice.addMember("Andi", Tier.REGULAR)     // Akan mendapat ID: AG-0001
-    memberservice.addMember("John", Tier.PREMIUM)    // Akan mendapat ID: AG-0002
-    memberservice.addMember("Freddy", Tier.STAFF)    // Akan mendapat ID: AG-0003
+    memberservice.addMember("Andi", Tier.REGULAR)
+    memberservice.addMember("John", Tier.PREMIUM)
+    memberservice.addMember("Freddy", Tier.STAFF)
 
-    // Setup Akun Admin & Pustakawan (TETAP DI SINI)
     userAccountRepo.save(UserAccount("admin", "admin", "admin123", Role.ADMIN))
     userAccountRepo.save(UserAccount("pustakawan", "pustakawan", "perpus456", Role.LIBRARIAN))
 
     println("\n--- setup successful ---\n")
 }
 
-// --- FUNGSI TAMPILAN MENU (BARU) ---
-
+// --- MENU ADMIN (SIMPel) ---
 fun showAdminMenu(currentUser: UserAccount): UserAccount? {
     println("\n===== MENU ADMIN =====")
-    println("1. Tambah Buku Cetak")
-    println("2. Tambah Anggota Baru")
-    println("3. Tampilkan Laporan")
-    println("4. Tampilkan Semua Buku (Test ID)")
-    println("5. Tampilkan Semua Anggota (Test ID)")
-    println("6. Logout")
+    println("1. Tambah Anggota Baru")
+    println("2. Tampilkan Laporan")
+    println("3. Tampilkan Semua Buku (Test ID)")
+    println("4. Tampilkan Semua Anggota (Test ID)")
+    println("5. Logout")
     print("Pilih menu Admin: ")
 
     when (readLine()) {
         "1" -> {
-            print("Judul: "); val j = readLine()!!
-            print("Penulis: "); val p = readLine()!!
-            print("Tahun: "); val t = readLine()!!.toInt()
-            print("Kategori: "); val k = readLine()!!
-            print("Jml Halaman: "); val h = readLine()!!.toInt()
-            print("Stok: "); val s = readLine()!!.toInt()
-            catalogueservice.addPrintedBook(j, p, t, k, h, s)
-        }
-        "2" -> {
             print("Nama Anggota Baru: "); val n = readLine()!!
             print("Tier (REGULAR, PREMIUM, STAFF): "); val t = Tier.valueOf(readLine()!!.uppercase())
-            memberservice.addMember(n, t) // Ini akan otomatis membuat akun login
+            memberservice.addMember(n, t)
         }
-        "3" -> {
+        "2" -> {
             reportservice.showactiveborrow()
             reportservice.showtopbook()
             reportservice.showqueuereservation()
         }
-        "4" -> {
+        "3" -> {
             println("--- Daftar Semua Buku ---")
             bookRepo.findAll().forEach { println(it.info()) }
         }
-        "5" -> {
+        "4" -> {
             println("--- Daftar Semua Anggota ---")
             memberRepo.findAll().forEach { println("ID: ${it.id} | Nama: ${it.name} | Tier: ${it.tier}") }
         }
-        "6" -> {
+        "5" -> {
             println("Anda telah logout.")
-            return null // Mengembalikan null untuk logout
+            return null
         }
         else -> println("Pilihan tidak valid.")
     }
-    return currentUser // Tetap login
+    return currentUser
 }
 
+// --- MENU PUSTAKAWAN (TAMBAH OPSI TAMBAH BUKU) ---
 fun showLibrarianMenu(currentUser: UserAccount): UserAccount? {
     println("\n===== MENU PUSTAKAWAN =====")
-    println("1. Pinjam Buku")
-    println("2. Kembalikan Buku")
-    println("3. Tampilkan Laporan")
-    println("4. Cari Buku")
-    println("5. Tampilkan Antrian Reservasi")
-    println("6. Tampilkan Semua Buku (Test ID)")
-    println("7. Tampilkan Semua Anggota (Test ID)")
-    println("8. Logout")
+    println("1. Tambah Buku ")
+    println("2. Pinjam Buku")
+    println("3. Kembalikan Buku")
+    println("4. Tampilkan Laporan")
+    println("5. Cari Buku")
+    println("6. Tampilkan Antrian Reservasi")
+    println("7. Tampilkan Semua Buku (Test ID)")
+    println("8. Tampilkan Semua Anggota (Test ID)")
+    println("9. Logout")
     print("Pilih menu Pustakawan: ")
 
     when (readLine()) {
         "1" -> {
-            print("Masukkan ID Anggota: ")
-            val idMember = readLine()!!
-            print("Masukkan ID Buku: ")
-            val idBook = readLine()!!
+            // Pilih kategori buku dulu
+            println("\nPilih Kategori Buku yang Ingin Ditambahkan:")
+            println("1. Buku Cetak")
+            println("2. Buku Digital")
+            println("3. Buku Audio")
+            print("Masukkan pilihan (1-3): ")
+            val pilihanKategori = readLine()
+
+            if (pilihanKategori == "1") {
+                println("\n--- Tambah Buku Cetak ---")
+                print("Judul: "); val title = readLine()!!
+                print("Penulis: "); val author = readLine()!!
+                print("Tahun: "); val year = readLine()!!.toInt()
+                print("Kategori: "); val category = readLine()!!
+                print("Jumlah Halaman: "); val pages = readLine()!!.toInt()
+                print("Stok: "); val stock = readLine()!!.toInt()
+
+                catalogueservice.addPrintedBook(title, author, year, category, pages, stock)
+                println("✅ Buku cetak berhasil ditambahkan.")
+
+            } else if (pilihanKategori == "2") {
+                println("\n--- Tambah Buku Digital ---")
+                print("Judul: "); val title = readLine()!!
+                print("Penulis: "); val author = readLine()!!
+                print("Tahun: "); val year = readLine()!!.toInt()
+                print("Kategori: "); val category = readLine()!!
+                print("Ukuran File (MB): "); val sizeFileMB = readLine()!!.toDouble()
+                print("Format File (contoh: PDF, EPUB, MOBI): "); val format = readLine()!!
+
+                catalogueservice.addDigitalBook(title, author, year, category, sizeFileMB, format)
+                println("✅ Buku digital berhasil ditambahkan.")
+
+            } else if (pilihanKategori == "3") {
+                println("\n--- Tambah Buku Audio ---")
+                print("Judul: "); val title = readLine()!!
+                print("Narator: "); val narrator = readLine()!!
+                print("Tahun: "); val year = readLine()!!.toInt()
+                print("Kategori: "); val category = readLine()!!
+                print("Durasi (menit): "); val duration = readLine()!!.toInt()
+
+                catalogueservice.addAudioBook(title, narrator, year, category, duration, narrator)
+                println("✅ Buku audio berhasil ditambahkan.")
+
+            } else {
+                println("⚠️ Pilihan kategori tidak valid. Kembali ke menu utama.")
+            }
+        }
+
+        "2" -> {
+            print("Masukkan ID Anggota: "); val idMember = readLine()!!
+            print("Masukkan ID Buku: "); val idBook = readLine()!!
             circulationservice.borrowingbook(idMember, idBook)
         }
-        "2" -> {
-            print("Masukkan ID Anggota: ")
-            val idMember = readLine()!!
-            print("Masukkan ID Buku yang dikembalikan: ")
-            val idBook = readLine()!!
+        "3" -> {
+            print("Masukkan ID Anggota: "); val idMember = readLine()!!
+            print("Masukkan ID Buku yang dikembalikan: "); val idBook = readLine()!!
             circulationservice.givebackbook(idBook, idMember)
         }
-        "3" -> {
+        "4" -> {
             reportservice.showactiveborrow()
             reportservice.showtopbook()
             reportservice.showqueuereservation()
@@ -125,41 +153,37 @@ fun showLibrarianMenu(currentUser: UserAccount): UserAccount? {
                 reportservice.exportreportborrowtocsv()
             }
         }
-        "4" -> {
+        "5" -> {
             print("Masukkan judul/penulis/kategori untuk dicari: ")
             val query = readLine()!!
             val result = catalogueservice.findBook(query)
             println("--- Hasil Pencarian ---")
-            if (result.isEmpty()) println("Buku tidak ditemukan.")
-            else result.forEach { println(it.info()) }
+            if (result.isEmpty()) println("Buku tidak ditemukan.") else result.forEach { println(it.info()) }
         }
-        "5" -> reportservice.showqueuereservation()
-        "6" -> {
+        "6" -> reportservice.showqueuereservation()
+        "7" -> {
             println("--- Daftar Semua Buku ---")
             bookRepo.findAll().forEach { println(it.info()) }
         }
-        "7" -> {
+        "8" -> {
             println("--- Daftar Semua Anggota ---")
             memberRepo.findAll().forEach { println("ID: ${it.id} | Nama: ${it.name} | Tier: ${it.tier}") }
         }
-        "8" -> {
+        "9" -> {
             println("Anda telah logout.")
-            return null // Logout
+            return null
         }
         else -> println("Pilihan tidak valid.")
     }
-    return currentUser // Tetap login
+    return currentUser
 }
 
+// --- MENU ANGGOTA ---
 fun showMemberMenu(currentUser: UserAccount): UserAccount? {
-    // --- PERBAIKAN DI SINI ---
-    // Ganti: val memberId = currentUser.associatedMemberId
-    // Menjadi:
     val memberId = currentUser.idMemberrelated
-
     if (memberId == null) {
         println("Error: Akun anggota ini tidak terhubung dengan data member.")
-        return null // Logout paksa jika ada error konfigurasi
+        return null
     }
 
     println("\n===== MENU ANGGOTA (ID: $memberId) =====")
@@ -175,52 +199,42 @@ fun showMemberMenu(currentUser: UserAccount): UserAccount? {
             val query = readLine()!!
             val result = catalogueservice.findBook(query)
             println("--- Hasil Pencarian ---")
-            if (result.isEmpty()) println("Buku tidak ditemukan.")
-            else result.forEach { println(it.info()) }
+            if (result.isEmpty()) println("Buku tidak ditemukan.") else result.forEach { println(it.info()) }
         }
         "2" -> {
             print("Masukkan ID Buku yang ingin direservasi: ")
             val idBook = readLine()!!
             circulationservice.borrowingbook(memberId, idBook)
         }
-        "3" -> { // (Saya perbaiki typo "3.0" Anda menjadi "3")
+        "3" -> {
             println("--- Peminjaman Aktif Saya ---")
             val myBorrows = borrowRepo.findAll().filter { it.idMember == memberId && it.dateBack == null }
-            if (myBorrows.isEmpty()) {
-                println("Anda tidak memiliki pinjaman aktif.")
-            } else {
-                myBorrows.forEach {
-                    val book = bookRepo.findById(it.idBook)
-                    println("- Judul: ${book?.title ?: "N/A"} | ID Buku: ${it.idBook} | Jatuh Tempo: ${it.deadline}")
-                }
+            if (myBorrows.isEmpty()) println("Anda tidak memiliki pinjaman aktif.")
+            else myBorrows.forEach {
+                val book = bookRepo.findById(it.idBook)
+                println("- Judul: ${book?.title ?: "N/A"} | ID Buku: ${it.idBook} | Jatuh Tempo: ${it.deadline}")
             }
         }
         "4" -> {
             println("Anda telah logout.")
-            return null // Logout
+            return null
         }
         else -> println("Pilihan tidak valid.")
     }
-    return currentUser // Tetap login
+    return currentUser
 }
 
-
-// --- FUNGSI MAIN (VERSI UPGRADE) ---
+// --- FUNGSI MAIN ---
 fun main() {
-    var activeUser: UserAccount? = null // Ganti 'loggedIn' dengan 'activeUser'
+    var activeUser: UserAccount? = null
+    setupearlydata()
 
-    setupearlydata() // Panggil setup data di awal
-
-    while (true) { // Loop utama aplikasi
+    while (true) {
         if (activeUser == null) {
-            // --- Sesi Login ---
-            print("Username: ")
-            val username = readLine()!!
-            print("Password: ")
-            val password = readLine()!!
+            print("Username: "); val username = readLine()!!
+            print("Password: "); val password = readLine()!!
             activeUser = authservice.login(username, password)
         } else {
-            // --- Logika Menu Berdasarkan Role ---
             activeUser = when (activeUser.role) {
                 Role.ADMIN -> showAdminMenu(activeUser)
                 Role.LIBRARIAN -> showLibrarianMenu(activeUser)

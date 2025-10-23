@@ -14,6 +14,11 @@ class Catalogueservice (private val bookRepo:Repository<Book>){
         bookRepo.save(book)
         println("Book ${book.title} added successfully")
     }
+    fun addAudioBook(title: String, author: String, year: Int, category: String, durationMinutes: Int, narrator: String) {
+        val book = AudioBook(IdGenerator.generateBookId(), title, author, year, category, durationMinutes, narrator)
+        bookRepo.save(book)
+        println("Audio book '${book.title}' added successfully.")
+    }
     fun findBook(query:String):List<Book>{
         return bookRepo.findAll().filter{
             it.title.contains(query,ignoreCase = true)||
