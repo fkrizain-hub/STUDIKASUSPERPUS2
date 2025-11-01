@@ -21,34 +21,63 @@ Proyek ini ditulis menggunakan bahasa **Kotlin** dan mensimulasikan sistem seder
 
 ## Struktur Proyek
 src/
+
 ├── model/
+
 │   ├── AudioBook.kt
+
 │   ├── Book.kt
+
 │   ├── Borrowing.kt
+
 │   ├── DigitalBook.kt
+
 │   ├── Member.kt
+
 │   ├── PrintedBook.kt
+
 │   ├── Reservation.kt
+
 │   ├── Role.kt
+
 │   ├── Tier.kt
+
 │   └── UserAccount.kt
+
 │
+
 ├── repository/
+
 │   ├── InMemoryRepo.kt
+
 │   └── Repository.kt
+
 │
+
 ├── service/
+
 │   ├── AuthenticationService.kt
+
 │   ├── CatalogueService.kt
+
 │   ├── CirculationService.kt
+
 │   ├── FineStrategy.kt
+
 │   ├── MemberService.kt
+
 │   ├── ReportService.kt
+
 │   └── ReservationService.kt
+
 │
+
 ├── util/
+
 │   └── IdGenerator.kt
+
 │
+
 └── Main.kt
 
 ## Cara Menjalankan Program
@@ -59,16 +88,21 @@ src/
 
 ## Pembagian Tugas
 1.	Anggota 1: Analisis & desain class diagram (OOP structure + UML)
+
 	Membuat Use Case Diagram dan menjelaskan kebutuhan sistem.
-2.	Anggota 2: Implementasi model & repository
+3.	Anggota 2: Implementasi model & repository
+
 	Mendesain Class Diagram dan relasi antar objek.
-3.	Anggota 3: Implementasi service logic (peminjaman, pengembalian, reservasi)
+5.	Anggota 3: Implementasi service logic (peminjaman, pengembalian, reservasi)
+
 	Mengimplementasikan model serta logika dasar pada sistem.
-4.	Anggota 4: Implementasi antarmuka CLI & laporan
+7.	Anggota 4: Implementasi antarmuka CLI & laporan
+
 	Mengembangkan logic lanjutan dan melakukan implementasi interface (IML).
 
 ## Output Yang Diharapkan
 C:\Users\jovan\.jdks\openjdk-24.0.2+12-54\bin\java.exe "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2025.2\lib\idea_rt.jar=53757" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath C:\Users\jovan\IdeaProjects\perpus2\out\production\perpus2;C:\Users\jovan\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\2.1.21\kotlin-stdlib-jdk8-2.1.21.jar;C:\Users\jovan\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\2.1.21\kotlin-stdlib-2.1.21.jar;C:\Users\jovan\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\jovan\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\2.1.21\kotlin-stdlib-jdk7-2.1.21.jar MainKt
+
 Book Laskar Pelangi added successfully
 Book Bumi Manusia added successfully
 Book Filosofi Teras added successfully
